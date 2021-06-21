@@ -26,25 +26,28 @@ public class LoginServlet extends HttpServlet {
             throws ServletException, IOException {
         
         HttpSession session = request.getSession();
-        String userName = (String)session.getAttribute("usernameEnetered");
-        
+       // String userName = (String)session.getAttribute("usernameEnetered");
+        User user = (User)session.getAttribute("user");
         String logout = request.getParameter("logout");
         //check if 'Log out' link has been clicked
-        if (logout == null){
-            logout = "";
-        }
-        if (logout.equals("true")){
+       
+        if (logout != null){
             //if clicked -end session - invalidate 
             session.invalidate();
             request.setAttribute("msg","You have logged out succesfully");
+            getServletContext().getRequestDispatcher("/WEB-INF/login.jsp").forward(request, response);
+            return;
         }
-        else {
-            response.sendRedirect("/home");
+       
+        //check is user logged in
+        else if (user != null){
+            
+        response.sendRedirect("home");
         }
-        
-        
+        else{
         getServletContext().getRequestDispatcher("/WEB-INF/login.jsp").forward(request,response);
-            }
+        }
+    }  
 
    
     @Override
@@ -54,27 +57,38 @@ public class LoginServlet extends HttpServlet {
         HttpSession session = request.getSession();
         String userName = request.getParameter("usernameEntered");
         String userPassword = request.getParameter("passwordEntered");
+        String name ;
+        String pass ;
         
-        //validate form entry
-        if(userName == null || userPassword == null || userName.equals("") || userPassword.equals("")){
-            request.setAttribute("msg", "Enter username and password.");
-        getServletContext().getRequestDispatcher("/WEB-INF/login.jsp").forward(request, response);
+        if( userName != null || userPassword != null){
+           name = userName;
+           pass = userPassword;
+        }
+        else{
+             request.setAttribute("msg", "Invalid username or password..");
+              getServletContext().getRequestDispatcher("/WEB-INF/login.jsp").forward(request, response);
       return;
         }
-      // passing the user name and password parameters to the login() method of a service class AccountService
-       User user = service.login(userName, userPassword);
-       //validate
-       if (user == null){
+       
+      
+    // passing the user name and password parameters to the login() method of a service class AccountService
+    
+       User user = service.login(name, pass);
+        
+       // validate form entry
+        if(user != null){
+         session.setAttribute("userName", userName);
+           session.setAttribute("user", user);
+           response.sendRedirect("home");
+           
+            }
+            else {
            request.setAttribute("msg", "Invalid username or password.");
             getServletContext().getRequestDispatcher("/WEB-INF/login.jsp").forward(request, response);
       return;
        }
-       
-       else {
-           session.setAttribute("usernameEnetered", userName);
-           response.sendRedirect("home");
            
-       }
+        
     }
    
     

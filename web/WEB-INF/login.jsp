@@ -13,9 +13,9 @@
     </head>
     <body>
         <h1>Login</h1>
-        <form method="post" action="home">
+        <form method="post" action="login">
             <label>Username:</label>
-            <input type="text" name="usernameEntered" value="">
+            <input type="text" name="usernameEntered" value=${usernameEnetered}><br>
             <label>Password:</label>
             <input type="password" name="passwordEnetered"><br>
             <input type="submit" value="Login">
